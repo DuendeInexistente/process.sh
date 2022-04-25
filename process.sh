@@ -33,38 +33,76 @@ cd "$file"
 cd ../../..
 done
 
-for file in gallery-dl/kemonoparty/*/* ; do
+for file in gallery-dl/kemonoparty/* ; do
 echo "$file"
 cd "$file"
-
 						for file in *.(jpg|png|mp4) ; do
 						echo "$file"
 						echo "Source:Kemono" > "$file.txt"
-cat "$file.txt"
 
 						cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
 						cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
 						cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
+
+						cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
+						cp /tmp/c "$file.txt"
+
+						sed 's/'\"'//g' "$file.txt" > /tmp/a
+						cp /tmp/a "$file.txt"
+
+						sed 's/,$//g' "$file.txt" > /tmp/b
+						cp /tmp/b "$file.txt"
 						done
-cd ../../..
+
+cd ../../../..
 done
 
-for file in gallery-dl/coomerparty/*/* ; do
+for file in gallery-dl/coomerparty/* ; do
+echo "$file"
+cd "$file"
+						for file in *.(jpg|png|mp4) ; do
+						echo "$file"
+						echo "Source:coomer" > "$file.txt"
+
+						cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
+						cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
+						cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
+
+						cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
+						cp /tmp/c "$file.txt"
+
+						sed 's/'\"'//g' "$file.txt" > /tmp/a
+						cp /tmp/a "$file.txt"
+
+						sed 's/,$//g' "$file.txt" > /tmp/b
+						cp /tmp/b "$file.txt"
+						done
+
+cd ../../../..
+done
+
+for file in gallery-dl/exhentai/* ; do
 echo "$file"
 cd "$file"
 
 						for file in *.(jpg|png|mp4) ; do
 						echo "$file"
-						echo "Source:coomer" > "$file.txt"
-cat "$file.txt"
+						echo "Source:exhentai" > "$file.txt"
 
-						cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
-						cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
-						cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
+						cat "$file.json" | jq '.title' | sed 's/^/gallery: /g' >> "$file.txt"
+						cat "$file.json" | jq '.num' | sed 's/^/page: /g' >> "$file.txt"
+						cat "$file.json" | jq '.tags' >> "$file.txt"
+						cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
+						cp /tmp/c "$file.txt"
+
+						sed 's/'\"'//g' "$file.txt" > /tmp/a
+						cp /tmp/a "$file.txt"
+
+						sed 's/,$//g' "$file.txt" > /tmp/b
+						cp /tmp/b "$file.txt"
 						done
 cd ../../..
 done
-
 
 
 find -empty
