@@ -12,8 +12,10 @@ cd "$file"
 						cat "$file.json" | jq '.mentions' | grep name | sed 's/^/mentions: /g'  >> "$file.txt"
 						cat "$file.json" | jq '.mentions' | grep nick | sed 's/^/mentions: /g'  >> "$file.txt"
 
-						cat "$file.json" | jq '.user' | grep name | sed 's/^/author: /g' >> "$file.txt"
-						cat "$file.json" | jq '.user' | grep nick | sed 's/^/author: /g' >> "$file.txt"
+						cat "$file.json" | jq '.author' | grep name | sed 's/^/author: /g' >> "$file.txt"
+						cat "$file.json" | jq '.author' | grep nick | sed 's/^/author: /g' >> "$file.txt"
+						cat "$file.json" | jq '.author' | grep id | sed 's/^/author: /g' >> "$file.txt"
+
 
 						cat "$file.json" | jq '.tweet_id' | sed 's/^/tweet_id:/g' >> "$file.txt"
 						#cat "$file.json" | jq '.content' | sed 's/^/tweet_content:/g' >> "$file.txt"
