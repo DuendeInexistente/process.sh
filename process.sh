@@ -7,8 +7,9 @@ cd "$file"
 
 						for file in *.(jpg|png|mp4) ; do
 						echo "$file"
+						echo "Source:Twitter" > "$file.txt"
 
-						cat "$file.json" | jq '.mentions' | grep id | sed 's/^/mentions: /g' > "$file.txt"
+						cat "$file.json" | jq '.mentions' | grep id | sed 's/^/mentions: /g' >> "$file.txt"
 						cat "$file.json" | jq '.mentions' | grep name | sed 's/^/mentions: /g'  >> "$file.txt"
 						cat "$file.json" | jq '.mentions' | grep nick | sed 's/^/mentions: /g'  >> "$file.txt"
 
@@ -29,12 +30,41 @@ cd "$file"
 						sed 's/,$//g' "$file.txt" > /tmp/b
 						cp /tmp/b "$file.txt"
 						done
-
-
-cd ..
-cd ..
-cd ..
+cd ../../..
 done
+
+for file in gallery-dl/kemonoparty/*/* ; do
+echo "$file"
+cd "$file"
+
+						for file in *.(jpg|png|mp4) ; do
+						echo "$file"
+						echo "Source:Kemono" > "$file.txt"
+cat "$file.txt"
+
+						cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
+						cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
+						cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
+						done
+cd ../../..
+done
+
+for file in gallery-dl/coomerparty/*/* ; do
+echo "$file"
+cd "$file"
+
+						for file in *.(jpg|png|mp4) ; do
+						echo "$file"
+						echo "Source:coomer" > "$file.txt"
+cat "$file.txt"
+
+						cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
+						cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
+						cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
+						done
+cd ../../..
+done
+
 
 
 find -empty
