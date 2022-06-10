@@ -7,7 +7,7 @@
 #	cat "$file.json" | jq ".source_url">>test
 #done
 find gallery-dl -iname "info.json" -delete
-find gallery-dl -iname -empty -delete
+find gallery-dl -empty -delete
 
 if [ -d "./gallery-dl/kemonoparty" ]
 then
@@ -95,6 +95,8 @@ fi
 
 
 
+if [ -d "./gallery-dl/twitter" ]
+then
 
 for file in gallery-dl/twitter/* ; do
 echo "$file"
@@ -123,14 +125,8 @@ cd "$file"
 cd ../../..
 done
 
-
-
-
-
-
-
-
-for file in gallery-dl/*/*/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
+fi
+for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
 echo "$file"
 	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
 
@@ -142,14 +138,15 @@ echo "$file"
 	cp /tmp/b "$file.txt"
 done
 
-for file in gallery-dl/*/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
-echo "$file"
-	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
 
-	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-	cp /tmp/c "$file.txt"
-	sed 's/'\"'//g' "$file.txt" > /tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/,$//g' "$file.txt" > /tmp/b
-	cp /tmp/b "$file.txt"
-done
+
+
+
+
+
+
+
+
+
+
+
