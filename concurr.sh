@@ -1,6 +1,4 @@
 #!/bin/bash
-mkdir -p logs
-mkdir -p terabackups
 
 # This is the concurrency limit
 MAX_POOL_SIZE=5
