@@ -125,7 +125,52 @@ cd "$file"
 cd ../../..
 done
 
+
+
 fi
+
+
+if [ -d "./gallery-dl/e621/pool" ]
+then 
+
+cd gallery-dl/e621/pool
+for file in *;do
+cd $file
+	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
+                cat "$file.json" | jq '.pool' | grep \"name | sed 's/^/series: /g' | sed 's/   \"name\": \"//g' | sed 's/\",//g' >>$file.txt
+		echo $file
+	done
+cd ..
+done
+repeat 3 cd ..
+
+fi
+
+
+
+if [ -d "./gallery-dl/pixiv" ]
+then 
+
+for file in gallery-dl/pixiv/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip);do
+                cat "$file.json" | jq '.rating' | grep \"rating | sed 's/^/rating: /g' | sed 's/   \"rating\": \"//g' | sed 's/\",//g' >>$file.txt
+		echo $file
+done
+
+fi
+
+
+if [ -d "./gallery-dl/newgrounds" ]
+then
+
+for file in gallery-dl/newgrounds/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip);do
+                jq .rating "$file.json" | sed 's/\"//g' |sed 's/^/rating: /g' >>$file.txt
+done
+
+fi
+
+
+
+
 for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
 echo "$file"
 	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
@@ -137,6 +182,12 @@ echo "$file"
 	sed 's/,$//g' "$file.txt" > /tmp/b
 	cp /tmp/b "$file.txt"
 done
+
+
+
+
+
+
 
 
 
