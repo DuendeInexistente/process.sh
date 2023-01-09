@@ -5,3 +5,4 @@ mkdir -p terabackups
 ./list.sh > /tmp/list.txt 
 ./concurr.sh $@
 ./process.sh
+gzip logs/*.txt
