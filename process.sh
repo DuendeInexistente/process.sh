@@ -102,7 +102,7 @@ cd "$file"
 
 		cat "$file.json" | jq '.title' | sed 's/^/gallery: /g' >> "$file.txt"
 		cat "$file.json" | jq '.num' | sed 's/^/page: /g' >> "$file.txt"
-		cat "$file.json" | jq '.tags' >> "$file.txt"
+		cat "$file.json" | jq '.tags' | sed 's/ /\n/g' >> "$file.txt"
 		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
 		cp /tmp/c "$file.txt"
 
@@ -135,6 +135,8 @@ cd "$file"
 		cat "$file.json" | jq '.author' | grep name | sed 's/^/author: /g' >> "$file.txt"
 		cat "$file.json" | jq '.author' | grep nick | sed 's/^/author: /g' >> "$file.txt"
 		cat "$file.json" | jq '.author' | grep id | sed 's/^/author: /g' >> "$file.txt"
+		
+		cat "$file.json" | jq '.search' | sed 's/^/search: /g' >> "$file.txt"
 
 
 		cat "$file.json" | jq '.tweet_id' | sed 's/^/tweet_id:/g' >> "$file.txt"
@@ -198,13 +200,32 @@ fi
 for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
 echo "$file"
 	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
+	cat "$file.json" | jq '.artist' | sed 's/^/artist: /g' >> "$file.txt"
+	sed -i '/artist: null/d' "$file.txt"
+	sed -i '/artist: \[/d' "$file.txt"
+	sed -i '/artist: \]/d' "$file.txt"
+	
+#	cat "$file.json" | jq '.tags' | sed 's/[[:space:]]/\n/g'>> "$file.txt"
+	sed -i '/null/d' "$file.txt"
+	sed -i '/\[/d' "$file.txt"
+	sed -i '/\]/d' "$file.txt"
+	
 
-	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-	cp /tmp/c "$file.txt"
-	sed 's/'\"'//g' "$file.txt" > /tmp/a
+	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/a
 	cp /tmp/a "$file.txt"
-	sed 's/,$//g' "$file.txt" > /tmp/b
-	cp /tmp/b "$file.txt"
+	sed 's/'\"'//g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
+	sed 's/,$//g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
+	sed 's/^ //g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
+	sed 's/^tags: //g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
+
+	sed 's/}//g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
+	sed 's/{//g' "$file.txt">/tmp/a
+	cp /tmp/a "$file.txt"
 done
 
 
@@ -265,4 +286,4 @@ cd ../..
 
 fi
 
-
+find -iname "*.txt.txt" -delete
