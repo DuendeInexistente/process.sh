@@ -34,15 +34,6 @@ cd "$file"
 		cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
 		cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
 		cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
-
-		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-		cp /tmp/c "$file.txt"
-
-		sed 's/'\"'//g' "$file.txt" > /tmp/a
-		cp /tmp/a "$file.txt"
-
-		sed 's/,$//g' "$file.txt" > /tmp/b
-		cp /tmp/b "$file.txt"
 	done
 	
 	for file in *.(zip|rar|7z); do 
@@ -74,15 +65,6 @@ cd "$file"
 		cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
 		cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
 		cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
-
-		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-		cp /tmp/c "$file.txt"
-
-		sed 's/'\"'//g' "$file.txt" > /tmp/a
-		cp /tmp/a "$file.txt"
-
-		sed 's/,$//g' "$file.txt" > /tmp/b
-		cp /tmp/b "$file.txt"
 	done
 
 cd ../../../..
@@ -103,14 +85,6 @@ cd "$file"
 		cat "$file.json" | jq '.title' | sed 's/^/gallery: /g' >> "$file.txt"
 		cat "$file.json" | jq '.num' | sed 's/^/page: /g' >> "$file.txt"
 		cat "$file.json" | jq '.tags' | sed 's/ /\n/g' >> "$file.txt"
-		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-		cp /tmp/c "$file.txt"
-
-		sed 's/'\"'//g' "$file.txt" > /tmp/a
-		cp /tmp/a "$file.txt"
-
-		sed 's/,$//g' "$file.txt" > /tmp/b
-		cp /tmp/b "$file.txt"
 	done
 cd ../../..
 done
@@ -141,12 +115,6 @@ cd "$file"
 
 		cat "$file.json" | jq '.tweet_id' | sed 's/^/tweet_id:/g' >> "$file.txt"
 		#cat "$file.json" | jq '.content' | sed 's/^/tweet_content:/g' >> "$file.txt"
-		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-		cp /tmp/c "$file.txt"
-		sed 's/'\"'//g' "$file.txt" > /tmp/a
-		cp /tmp/a "$file.txt"
-		sed 's/,$//g' "$file.txt" > /tmp/b
-		cp /tmp/b "$file.txt"
 	done
 cd ../../..
 done
@@ -197,49 +165,6 @@ fi
 
 
 
-for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
-echo "$file"
-	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
-	cat "$file.json" | jq '.artist' | sed 's/^/artist: /g' >> "$file.txt"
-	sed -i '/artist: null/d' "$file.txt"
-	sed -i '/artist: \[/d' "$file.txt"
-	sed -i '/artist: \]/d' "$file.txt"
-	
-#	cat "$file.json" | jq '.tags' | sed 's/[[:space:]]/\n/g'>> "$file.txt"
-	sed -i '/null/d' "$file.txt"
-	sed -i '/\[/d' "$file.txt"
-	sed -i '/\]/d' "$file.txt"
-	
-
-	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/'\"'//g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/,$//g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/^ //g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/^tags: //g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-
-	sed 's/}//g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-	sed 's/{//g' "$file.txt">/tmp/a
-	cp /tmp/a "$file.txt"
-done
-
-
-
-
-
-
-
-
-
-
-
-
-
 if [ -d "./gallery-dl/directlink" ]
 then
 cd gallery-dl/directlink
@@ -247,13 +172,6 @@ for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
 		echo "$file"
 		echo "source: directlink" >>"$file.txt"
 		cat "$file.json" | jq '.domain' | sed 's/^/domain: /g' >> "$file.txt"
-
-		cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-		cp /tmp/c "$file.txt"
-		sed 's/'\"'//g' "$file.txt" > /tmp/a
-		cp /tmp/a "$file.txt"
-		sed 's/,$//g' "$file.txt" > /tmp/b
-		cp /tmp/b "$file.txt"
 
 done
 cd ../..
@@ -272,18 +190,39 @@ cat "$file.json" | jq .author | grep username | sed 's/username/artist/g' >> $fi
 cat "$file.json" | jq .is_mature | sed 's/is_mature//g' | sed 's/^/damature:/g' >> $file.txt
 cat "$file.json" | jq .da_category | sed 's/^/dacategory:/g'  >> $file.txt
 
-                cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
-                cp /tmp/c "$file.txt"
-                sed 's/'\"'//g' "$file.txt" > /tmp/a
-                cp /tmp/a "$file.txt"
-                sed 's/,$//g' "$file.txt" > /tmp/b
-                cp /tmp/b "$file.txt"
-
 
 done
 
 cd ../..
 
 fi
+
+
+
+for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
+echo "$file"
+	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
+	cat "$file.json" | jq '.artist' | sed 's/^/artist: /g' >> "$file.txt"
+	sed -i '/artist: null/d' "$file.txt"
+	sed -i '/artist: \[/d' "$file.txt"
+	sed -i '/artist: \]/d' "$file.txt"
+	
+#	cat "$file.json" | jq '.tags' | sed 's/[[:space:]]/\n/g'>> "$file.txt"
+	sed -i '/null/d' "$file.txt"
+	sed -i '/\[/d' "$file.txt"
+	sed -i '/\]/d' "$file.txt"
+	
+	sed -i '/\}/d' "$file.txt"
+	sed -i '/\{/d' "$file.txt"
+	
+	sed -i '/\"/d' "$file.txt"
+	sed -i '/\,$/d' "$file.txt"
+	sed -i '/^ /d' "$file.txt"
+	sed -i '/^tags: /d' "$file.txt"
+	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
+
+done
+
+
 
 find -iname "*.txt.txt" -delete
