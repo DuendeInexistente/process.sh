@@ -24,7 +24,7 @@ find gallery-dl -empty -delete
 
 if [ -d "./gallery-dl/kemonoparty" ]
 then
-
+echo kemono
 for file in gallery-dl/kemonoparty/*/* ; do
 echo "$file"
 cd "$file"
@@ -55,6 +55,7 @@ fi
 
 if [ -d "./gallery-dl/coomerparty" ]
 then
+echo coomer
 
 for file in gallery-dl/coomerparty/*/* ; do
 echo "$file"
@@ -74,6 +75,7 @@ fi
 
 if [ -d "./gallery-dl/exhentai" ]
 then
+echo exh
 
 for file in gallery-dl/exhentai/* ; do
 echo "$file"
@@ -95,6 +97,7 @@ fi
 
 if [ -d "./gallery-dl/twitter" ]
 then
+echo twitter
 
 for file in gallery-dl/twitter/* ; do
 echo "$file"
@@ -126,6 +129,7 @@ fi
 
 if [ -d "./gallery-dl/e621/pool" ]
 then 
+echo e621pool
 
 cd gallery-dl/e621/pool
 for file in *;do
@@ -144,6 +148,7 @@ fi
 
 if [ -d "./gallery-dl/pixiv" ]
 then 
+echo pixiv
 
 for file in gallery-dl/pixiv/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip);do
                 cat "$file.json" | jq '.rating' | grep \"rating | sed 's/^/rating: /g' | sed 's/   \"rating\": \"//g' | sed 's/\",//g' >>$file.txt
@@ -155,6 +160,7 @@ fi
 
 if [ -d "./gallery-dl/newgrounds" ]
 then
+echo newgrounds
 
 for file in gallery-dl/newgrounds/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip);do
                 jq .rating "$file.json" | sed 's/\"//g' |sed 's/^/rating: /g' >>$file.txt
@@ -167,6 +173,8 @@ fi
 
 if [ -d "./gallery-dl/directlink" ]
 then
+echo directlink
+
 cd gallery-dl/directlink
 for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
 		echo "$file"
@@ -178,18 +186,18 @@ cd ../..
 fi
 
 
-if [ -d "./gallery-dl/deviantart" ]
+if [ -d "./gallery-dl/toyhouse" ]
 then
-cd gallery-dl/deviantart
+echo toyhouse
+
+cd gallery-dl/toyhouse
 for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
 
 echo $file
 
-cat "$file.json" | jq .folders | sed '$d' | tail -n +2 | sed 's/^/dafolder:/g' >> $file.txt
-cat "$file.json" | jq .author | grep username | sed 's/username/artist/g' >> $file.txt
-cat "$file.json" | jq .is_mature | sed 's/is_mature//g' | sed 's/^/damature:/g' >> $file.txt
-cat "$file.json" | jq .da_category | sed 's/^/dacategory:/g'  >> $file.txt
-
+	cat "$file.json" | jq .characters | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/character:/g' | sed 's/character:$//g' >> $file.txt
+	#cat "$file.txt" | sed 's/character:$//g' > /tmp/char
+	#cp -f /tmp/char "$file.txt"
 
 done
 
@@ -198,28 +206,36 @@ cd ../..
 fi
 
 
-
+echo tweak
 for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
 echo "$file"
+
 	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
 	cat "$file.json" | jq '.artist' | sed 's/^/artist: /g' >> "$file.txt"
 	sed -i '/artist: null/d' "$file.txt"
 	sed -i '/artist: \[/d' "$file.txt"
 	sed -i '/artist: \]/d' "$file.txt"
-	
+
+
+
 #	cat "$file.json" | jq '.tags' | sed 's/[[:space:]]/\n/g'>> "$file.txt"
 	sed -i '/null/d' "$file.txt"
-	sed -i '/\[/d' "$file.txt"
-	sed -i '/\]/d' "$file.txt"
+
 	
-	sed -i '/\}/d' "$file.txt"
-	sed -i '/\{/d' "$file.txt"
-	
-	sed -i '/\"/d' "$file.txt"
-	sed -i '/\,$/d' "$file.txt"
-	sed -i '/^ /d' "$file.txt"
-	sed -i '/^tags: /d' "$file.txt"
-	cat "$file.txt" | sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g'>/tmp/c
+	cat "$file.txt" | sed 's/}//g' |\
+	sed 's/{//g' |\
+	\
+	sed 's/\[//g' |\
+	sed 's/\]//g' |\
+	\
+	sed 's/^ //g' |\
+	sed 's/^tags: //g' |\
+	sed 's/"//g' |\
+	\
+	sed 's/,$//g' |\
+	\
+	sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g' > /tmp/a.txt
+	cp -f /tmp/a.txt $file.txt
 
 done
 
