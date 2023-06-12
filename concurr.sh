@@ -54,7 +54,7 @@ while IFS= read -r line; do
   
   # When a new job is created, the program updates the $CURRENT_POOL_SIZE variable before next iteration
   CURRENT_POOL_SIZE=$(jobs | wc -l)
-  _log "Current pool size = $CURRENT_POOL_SIZE"
+  #_log "Current pool size = $CURRENT_POOL_SIZE"
   
   
 done < $JOB_LIST # this is where we feed the $JOB_LIST file for the read operation
