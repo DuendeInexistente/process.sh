@@ -206,6 +206,45 @@ cd ../..
 fi
 
 
+
+if [ -d "./gallery-dl/patreon" ]
+then
+echo patreon
+
+cd gallery-dl/patreon
+for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
+
+echo $file
+
+	cat "$file.json" | jq .title | sed 's/"//g' | sed 's/^/title:/g' >> $file.txt
+	cat "$file.json" | jq .num | sed 's/^/page:/g' >> $file.txt
+
+done
+
+cd ../..
+
+fi
+
+
+if [ -d "./gallery-dl/itaku" ]
+then
+echo itaku
+
+cd gallery-dl/itaku
+for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do
+
+echo $file
+
+	cat "$file.json" | jq .owner_username | sed 's/"//g' | sed 's/^/itaku_user:/g' >> $file.txt
+	cat "$file.json" | jq .sections | sed 's/^  "/itaku_folder: /g' | sed 's/,$//g' | sed 's/\"$//g' >> $file.txt
+
+done
+
+cd ../..
+
+fi
+
+
 echo tweak
 for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip) ; do  
 echo "$file"
