@@ -237,6 +237,7 @@ echo $file
 
 	cat "$file.json" | jq .owner_username | sed 's/"//g' | sed 's/^/itaku_user:/g' >> $file.txt
 	cat "$file.json" | jq .sections | sed 's/^  "/itaku_folder: /g' | sed 's/,$//g' | sed 's/\"$//g' >> $file.txt
+	cat "$file.json" | jq .maturity_rating | sed 's/"//g' | sed 's/^/itaku_rating:/g' >> $file.txt
 
 done
 
