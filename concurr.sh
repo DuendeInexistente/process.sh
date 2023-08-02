@@ -22,7 +22,7 @@ _log() {
 process_job() {
   # customize your job function as required
   # in our example, we just "ping" each hostname read from the file
-  ./dl.sh $@ | tee -a $OUTPUT
+  ./dl.sh $@
 }
 
 
