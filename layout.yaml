@@ -1,0 +1,11 @@
+session_name: backup
+windows:
+- layout: tiled
+  panes:
+  - ./dl.sh $(cat /tmp/lists/1.txt) $(cat /tmp/lists/echos.txt)
+  - ./dl.sh $(cat /tmp/lists/2.txt) $(cat /tmp/lists/echos.txt)
+  - ./dl.sh $(cat /tmp/lists/3.txt) $(cat /tmp/lists/echos.txt)
+  - ./dl.sh $(cat /tmp/lists/4.txt) $(cat /tmp/lists/echos.txt)
+  - ./dl.sh $(cat /tmp/lists/5.txt) $(cat /tmp/lists/echos.txt)
+  - ./dl.sh $(cat /tmp/lists/6.txt) $(cat /tmp/lists/echos.txt)
+  window_name: main
