@@ -1,23 +1,15 @@
 #!/usr/bin/bash
-
-valuelines=$(( $(./randlist.sh  | wc -l)/6+6))
-currlines=$valuelines
-episode=1
-./randlist.sh >/tmp/list.txt
+number=0
 mkdir /tmp/lists
-echo $@>/tmp/lists/echos.txt
 
-function increas
-(
-[ $episode != 7 ] && {
-	echo $episode:$currlines
-	head -n $currlines /tmp/list.txt | tail -n $valuelines>/tmp/lists/$episode.txt
-	currlines=$(($currlines+$valuelines))
-	episode=$(($episode+ 1 ))
-	increas
-}
-)
-increas
+./randlist.sh >/tmp/list.txt
+echo $@>/tmp/echos.txt
+
+while read p; do
+  echo "$p">/tmp/lists/$(printf "%03d" $number).txt
+  number=$(($number+1))
+done < /tmp/list.txt
+
 
 tmux kill-session -t backup
 tmuxp load ./layout.yaml
