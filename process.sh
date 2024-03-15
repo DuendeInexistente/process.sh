@@ -1,413 +1,224 @@
-#!/bin/zsh
+#!/usr/bin/zsh
 setopt NULL_GLOB
-#for file in gallery-dl/(*booru|*rule34*|e621)/*(|/*).(jpg|png|mp4|gif|wmv|webm|avi) ; do
-#	echo "$file">>test
-#	cat "$file.json" | jq ".source" >>test
-#	cat "$file.json" | jq ".sources">>test
-#	cat "$file.json" | jq ".sourcelist">>test
-#	cat "$file.json" | jq ".source_url">>test
-#done
-gzip logs/*.txt
-
+startdir=$PWD
 find gallery-dl -iname "info.json" -delete
 find gallery-dl -empty -delete
 
-
-#cd gallery-dl
-#for file in * ; do
-#	cd $file
-#	find . -mindepth 1 -type d '!' -exec sh -c 'ls -1 "{}"|egrep -i -q "^**\.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z)$"' ';' -print
-#done
-#cd ..
+#some_routine() {
+#    echo "foo $1"
+#}
+#
+#some_var=$(some_routine bar)
 
 
 
-if [ -d "./gallery-dl/deviantart" ]
-then
-echo kemono
-for file in gallery-dl/deviantart/* ; do
-echo "$file"
-cd "$file"
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
+textise() {
+  txt="$(echo $json | sed 's/\.json/\.txt/g')"
+  #echo $json
+  #echo $txt
+}
 
-		cat "$file.json" | jq '.author.username' | sed 's/^/artist: /g' >> "$file.txt"
-		cat "$file.json" | jq '.folders' | sed 's/^/dafolder: /g' >> "$file.txt"
-		cat "$file.json" | jq '.is_mature' | sed 's/^/damature: /g' >> "$file.txt"
-		cat "$file.json" | jq '.da_category' | sed 's/^/dacategory: /g' >> "$file.txt"
-	done
+basictag() {
+ # echo $json \"$json\"
+ # cat "$json" | jq $1 | sed 's/^/\${2}: /g' >> "$txt"
+ #sed doesn't like dealing with $variables, not at all
+ cat "$json" | jq $1 | while read line; do
+  echo $2: $line >>$txt
+ done
+}
 
-cd ../../..
+
+
+
+find -type d -path ./gallery-dl/\* | while read p; do
+#Primer find  
+  echo -----------------------
+  movepath="$startdir/$p"
+  echo "route: $movepath"
+  cd "$movepath"
+  category=$(cat "$(find -iname "*.json" | head -1)" | jq .category | sed 's/"//g')
+  subcat=$(cat "$(find -iname "*.json" | head -1)" | jq .subcategory | sed 's/"//g')
+
+  echo $PWD
+  echo "$p"
+  #ls  
+  
+
+echo $category
+case $category in
+  deviantart)
+    for json in *.json ; do
+      textise
+      basictag ".author.username" artist
+      basictag ".folders" dafolder
+      basictag ".is_mature" damature
+      basictag ".da_category" dacategory 
+    done
+;;
+  kemonoparty|coomerparty)
+    for json in *.json ; do
+      textise
+ 
+      basictag ".user" user
+      basictag ".id" post
+      basictag ".service" service
+      basictag ".subcategory" service
+      cat "$json" | jq '.tags' | sed 's/,/\n/g' | sed 's/\\//g' >> "$txt"
+    done
+
+        if [ $subcat = discord ]; then
+          for json in *.json ; do
+            textise
+
+            basictag ".author.username" discord_user
+            basictag ".chanel_name" discord_channel
+            basictag ".id" message_id
+          done
+        fi
+;;
+  exhentai)
+    for json in *.json ; do
+      textise
+        rm $txt
+
+        basictag ".title" gallery
+        basictag ".num" page
+    done
+;;
+  twitter)
+    for json in *.json ; do
+      textise
+      
+    cat "$json" | jq '.mentions' | grep id | sed 's/^/mentions: /g' >> "$txt"
+    cat "$json" | jq '.mentions' | grep name | sed 's/^/mentions: /g'  >> "$txt"
+    cat "$json" | jq '.mentions' | grep nick | sed 's/^/mentions: /g'  >> "$txt"
+
+    cat "$json" | jq '.author' | grep name | sed 's/^/author: /g' >> "$txt"
+    cat "$json" | jq '.author' | grep nick | sed 's/^/author: /g' >> "$txt"
+    cat "$json" | jq '.author' | grep id | sed 's/^/author: /g' >> "$txt"
+
+    cat "$json" | jq '.hashtags' | grep -v "\[" | grep -v "\]" |  sed 's/^/hashtag: /g' >> "$txt"
+
+    basictag ".search" search
+    basictag ".tweet_id" tweet_id
+
+    done
+;;
+bluesky)
+  for json in *.json ; do
+    textise
+
+    basictag ".post_id" post_id
+    cat "$json" | jq '.author' | grep handle | sed 's/^/author: /g' >> "$txt"
+    cat "$json" | jq '.author' | grep displayName | sed 's/^/author: /g' >> "$txt"
+    cat "$json" | jq '.labels.values' | grep val | sed 's/\"val\"://g' | sed 's/,/\n/g'  |  sed 's/^/bluesky_label: /g' >> "$txt"
+  done
+;;
+toyhouse)
+  for json in *.json ; do
+    textise
+      cat "$json" | jq .characters | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/character:/g' | sed 's/character:$//g' >> $txt
+      cat "$json" | jq .artists | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/artist:/g' | sed 's/artist:$//g' >> $txt
+  done
+;;
+patreon)
+  for json in *.json ; do
+    textise
+
+    cat "json" | jq .title | sed 's/"//g' | sed 's/^/title:/g' >> $txt
+    basictag ".num" page
+  done
+  ;;
+itaku)
+  for json in *.json ; do
+    textise
+    basictag ".owner_username" itaku_user
+    basictag ".maturity_rating" itaku_rating
+    cat "$json" | jq .sections | sed 's/^  "/itaku_folder: /g' | sed 's/,$//g' | sed 's/\"$//g' >> $txt
+  done
+  ;;
+directlink)
+  for json in *.json ; do
+    textise
+
+    basictag ".domain" domain
+  done
+  ;;
+esac
+
+
+
+
+echo $subcat
+case $subcat in
+  pool)
+    for json in *.json ; do
+      textise
+      basictag ".pool.name" series
+      basictag ".num" page
+    done
+;;
+esac
+
+
+
+
+
+
+
+
+
+
+
+
+
+  #General
+
+
+    echo "cleaning"
+#    echo 1
+  for json in *.json ; do  
+  textise
+ # echo $json $txt
+
+    basictag ".category" source
+    basictag ".artist" artist
+    basictag ".rating" rating
+  
+  done
+#echo 1 done
+#echo 2
+
+  for file in *.txt ; do  
+  #echo $file
+      sed -i '/artist: null/d' "$file"
+      sed -i '/artist: \[/d' "$file"
+      sed -i '/artist: \]/d' "$file"
+
+
+
+      sed -i '/null/d' "$file"
+
+      
+      cat "$file" | sed 's/}//g' |\
+      sed 's/{//g' |\
+      \
+      sed 's/\[//g' |\
+      sed 's/\]//g' |\
+      \
+      sed 's/^ //g' |\
+      sed 's/^tags: //g' |\
+      sed 's/"//g' |\
+      \
+      sed 's/,$//g' |\
+      \
+      sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g' > /tmp/a.txt
+      cp -f /tmp/a.txt $file
+
+  done
+#echo 2 done
+
+
+
+#Ultimo done
 done
-
-
-fi
-
-
-if [ -d "./gallery-dl/kemonoparty" ]
-then
-echo kemono
-for file in gallery-dl/kemonoparty/*/* ; do
-echo "$file"
-cd "$file"
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z|rar|7z) ; do
-		echo "$file"
-
-		cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
-		cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
-		cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
-		cat "$file.json" | jq '.tags' | sed 's/,/\n/g' | sed 's/\\//g' >> "$file.txt"
-
-	done
-	
-	for file in *.(zip|rar|7z); do 
-	unar -f "$file" -o "$file ext"
-	cp "$file.txt" "$file ext/tags.txt"
-	cd "$file ext"
-	echo "zipfile" >> tags.txt
-		for file in ./**/*; do
-			cp tags.txt "$file.txt"
-	done
-	cd ..
-done
-
-cd "/media/cammera/Datos/Pictures'/gallery-dl/"
-done
-
-    echo "$DIR_ABSOLUTE_PATH exists."
-fi
-
-
-
-
-
-if [ -d "./gallery-dl/kemonoparty/discord" ]
-then
-echo kemono
-for file in gallery-dl/kemonoparty/discord/*/* ; do
-echo "$file"
-cd "$file"
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z|rar|7z) ; do
-		echo "$file"
-
-		cat "$file.json" | jq '.author.username' | sed 's/^/discord_user: /g' >> "$file.txt"
-		cat "$file.json" | jq '.channel_name' | sed 's/^/discord_channel: /g' >> "$file.txt"
-		cat "$file.json" | jq '.id' | sed 's/^/message_id: /g' >> "$file.txt"
-		cat "$file.json" | jq '.subcategory' | sed 's/^/service: /g' >> "$file.txt"
-	done
-	
-	for file in *.(zip|rar|7z); do 
-	unar -f "$file" -o "$file ext"
-	cp "$file.txt" "$file ext/tags.txt"
-	cd "$file ext"
-	echo "zipfile" >> tags.txt
-		for file in ./**/*; do
-			cp tags.txt "$file.txt"
-	done
-	cd ..
-done
-
-cd "/media/cammera/Datos/Pictures'/gallery-dl/"
-done
-fi
-
-
-
-
-
-
-
-
-if [ -d "./gallery-dl/coomerparty" ]
-then
-echo coomer
-
-for file in gallery-dl/coomerparty/*/* ; do
-echo "$file"
-cd "$file"
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
-
-		cat "$file.json" | jq '.user' | sed 's/^/user: /g' >> "$file.txt"
-		cat "$file.json" | jq '.id' | sed 's/^/post: /g' >> "$file.txt"
-		cat "$file.json" | jq '.service' | sed 's/^/service: /g' >> "$file.txt"
-		cat "$file.json" | jq '.tags' | sed 's/,/\n/g' | sed 's/\\//g' >> "$file.txt"
-	done
-	echo linking...
-		for file in *.m4v ; do
-		ln "$file" "$file.mp4"
-	done
-
-cd ../../../..
-done
-
-fi
-
-if [ -d "./gallery-dl/exhentai" ]
-then
-echo exh
-
-for file in gallery-dl/exhentai/* ; do
-echo "$file"
-cd "$file"
-
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
-
-		cat "$file.json" | jq '.title' | sed 's/^/gallery: /g' >> "$file.txt"
-		cat "$file.json" | jq '.num' | sed 's/^/page: /g' >> "$file.txt"
-		cat "$file.json" | jq '.tags' | sed 's/ /\n/g' >> "$file.txt"
-	done
-cd ../../..
-done
-
-fi
-
-
-
-if [ -d "./gallery-dl/twitter" ]
-then
-echo twitter
-
-for file in gallery-dl/twitter/* ; do
-echo "$file"
-cd "$file"
-
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
-		cat "$file.json" | jq '.mentions' | grep id | sed 's/^/mentions: /g' >> "$file.txt"
-		cat "$file.json" | jq '.mentions' | grep name | sed 's/^/mentions: /g'  >> "$file.txt"
-		cat "$file.json" | jq '.mentions' | grep nick | sed 's/^/mentions: /g'  >> "$file.txt"
-
-		cat "$file.json" | jq '.author' | grep name | sed 's/^/author: /g' >> "$file.txt"
-		cat "$file.json" | jq '.author' | grep nick | sed 's/^/author: /g' >> "$file.txt"
-		cat "$file.json" | jq '.author' | grep id | sed 's/^/author: /g' >> "$file.txt"
-		
-		cat "$file.json" | jq '.search' | sed 's/^/search: /g' >> "$file.txt"
-		cat "$file.json" | jq '.hashtags' | grep -v "\[" | grep -v "\]" |  sed 's/^/hashtag: /g' >> "$file.txt"
-
-
-		cat "$file.json" | jq '.tweet_id' | sed 's/^/tweet_id:/g' >> "$file.txt"
-		#cat "$file.json" | jq '.content' | sed 's/^/tweet_content:/g' >> "$file.txt"
-	done
-cd ../../..
-done
-
-
-
-fi
-
-
-
-if [ -d "./gallery-dl/bluesky" ]
-then
-echo bluesky
-
-for file in gallery-dl/bluesky/* ; do
-echo "$file"
-cd "$file"
-
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
-
-		cat "$file.json" | jq '.author' | grep handle | sed 's/^/author: /g' >> "$file.txt"
-		cat "$file.json" | jq '.author' | grep displayName | sed 's/^/author: /g' >> "$file.txt"
-		
-		cat "$file.json" | jq '.labels.values' | grep val | sed 's/\"val\"://g' | sed 's/,/\n/g'  |  sed 's/^/bluesky_label: /g' >> "$file.txt"
-
-
-		cat "$file.json" | jq '.post_id' | sed 's/^/post_id:/g' >> "$file.txt"
-	done
-cd ../../..
-done
-
-
-
-fi
-
-
-
-
-
-
-if [ -d "./gallery-dl/e621/pool" ]
-then 
-echo e621pool
-
-cd gallery-dl/e621/pool
-for file in *;do
-cd $file
-	for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-                cat "$file.json" | jq '.pool' | grep \"name | sed 's/^/series: /g' | sed 's/   \"name\": \"//g' | sed 's/\",//g' >>$file.txt
-                cat "$file.json" | jq '.num' | sed 's/^/page: /g' | sed 's/   \"num\": \"//g' | sed 's/\",//g' >>$file.txt
-		echo $file
-	done
-cd ..
-done
-repeat 3 cd ..
-
-fi
-
-
-
-if [ -d "./gallery-dl/pixiv" ]
-then 
-echo pixiv
-
-for file in gallery-dl/pixiv/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z);do
-                cat "$file.json" | jq '.rating' | grep \"rating | sed 's/^/rating: /g' | sed 's/   \"rating\": \"//g' | sed 's/\",//g' >>$file.txt
-		echo $file
-done
-
-fi
-
-
-if [ -d "./gallery-dl/newgrounds" ]
-then
-echo newgrounds
-
-for file in gallery-dl/newgrounds/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z);do
-                jq .rating "$file.json" | sed 's/\"//g' |sed 's/^/rating: /g' >>$file.txt
-done
-
-fi
-
-
-
-
-if [ -d "./gallery-dl/directlink" ]
-then
-echo directlink
-
-cd gallery-dl/directlink
-for file in *.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-		echo "$file"
-		echo "source: directlink" >>"$file.txt"
-		cat "$file.json" | jq '.domain' | sed 's/^/domain: /g' >> "$file.txt"
-
-done
-cd ../..
-fi
-
-
-if [ -d "./gallery-dl/toyhouse" ]
-then
-echo toyhouse
-
-cd gallery-dl/toyhouse
-for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-
-echo $file
-
-	cat "$file.json" | jq .characters | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/character:/g' | sed 's/character:$//g' >> $file.txt
-	cat "$file.json" | jq .artists | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/artist:/g' | sed 's/artist:$//g' >> $file.txt
-	#cat "$file.txt" | sed 's/character:$//g' > /tmp/char
-	#cp -f /tmp/char "$file.txt"
-
-done
-
-cd ../..
-
-fi
-
-
-
-if [ -d "./gallery-dl/patreon" ]
-then
-echo patreon
-
-cd gallery-dl/patreon
-for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-
-echo $file
-
-	cat "$file.json" | jq .title | sed 's/"//g' | sed 's/^/title:/g' >> $file.txt
-	cat "$file.json" | jq .num | sed 's/^/page:/g' >> $file.txt
-
-done
-
-cd ../..
-
-fi
-
-
-if [ -d "./gallery-dl/itaku" ]
-then
-echo itaku
-
-cd gallery-dl/itaku
-for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-
-echo $file
-
-	cat "$file.json" | jq .owner_username | sed 's/"//g' | sed 's/^/itaku_user:/g' >> $file.txt
-	cat "$file.json" | jq .sections | sed 's/^  "/itaku_folder: /g' | sed 's/,$//g' | sed 's/\"$//g' >> $file.txt
-	cat "$file.json" | jq .maturity_rating | sed 's/"//g' | sed 's/^/itaku_rating:/g' >> $file.txt
-
-done
-
-cd ../..
-
-fi
-
-
-if [ -d "./gallery-dl/furaffinity" ]
-then
-echo itaku
-
-cd gallery-dl/furaffinity
-for file in ./**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do
-
-echo $file
-
-	cat "$file.json" | jq .rating | sed 's/"//g' | sed 's/^/rating:/g' >> $file.txt
-done
-
-cd ../..
-
-fi
-
-echo tweak
-for file in gallery-dl/**/*.(avi|gif|jpg|m4v|mp4|png|swf|webm|wmv|zip|rar|7z) ; do  
-echo "$file"
-
-	cat "$file.json" | jq '.category' | sed 's/^/source: /g' >> "$file.txt"
-	cat "$file.json" | jq '.artist' | sed 's/^/artist: /g' >> "$file.txt"
-#	cat "$file.json" | jq -r '.content' | grep -v "^null$" >> "$file.notes.txt"
-#	cat "$file.json" | jq -r '.description' | grep -v "^null$" >> "$file.notes.txt" 
-	
-done
-
-for file in gallery-dl/**/*.txt ; do  
-echo "$file"
-
-	sed -i '/artist: null/d' "$file"
-	sed -i '/artist: \[/d' "$file"
-	sed -i '/artist: \]/d' "$file"
-
-
-
-#	cat "$file.json" | jq '.tags' | sed 's/[[:space:]]/\n/g'>> "$file.txt"
-	sed -i '/null/d' "$file"
-
-	
-	cat "$file" | sed 's/}//g' |\
-	sed 's/{//g' |\
-	\
-	sed 's/\[//g' |\
-	sed 's/\]//g' |\
-	\
-	sed 's/^ //g' |\
-	sed 's/^tags: //g' |\
-	sed 's/"//g' |\
-	\
-	sed 's/,$//g' |\
-	\
-	sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g' > /tmp/a.txt
-	cp -f /tmp/a.txt $file
-
-done
-
-
-
-find -iname "*.txt.txt" -delete
