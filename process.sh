@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/usr/bin/sh
 setopt NULL_GLOB
 startdir=$PWD
 find gallery-dl -iname "info.json" -delete
@@ -217,6 +217,20 @@ esac
 
   done
 #echo 2 done
+
+
+for file in *.(zip|rar|7z); do 
+	unar -f "$file" -o "$file ext"
+	cp "$file.txt" "$file ext/tags.txt"
+	cd "$file ext"
+	echo "zipfile" >> tags.txt
+		for file in ./**/*; do
+			cp tags.txt "$file.txt"
+	cd ..
+done
+
+
+
 
 
 
