@@ -27,6 +27,15 @@ basictag() {
  done
 }
 
+greptag() {
+ # echo $json \"$json\"
+ # cat "$json" | jq $1 | sed 's/^/\${2}: /g' >> "$txt"
+ #sed doesn't like dealing with $variables, not at all
+ cat "$json" | jq $1 | grep $2 | while read line; do
+  echo $3: $line >>$txt
+ done
+}
+
 
 
 
@@ -89,13 +98,15 @@ case $category in
     for json in *.json ; do
       textise
       
-    cat "$json" | jq '.mentions' | grep id | sed 's/^/mentions: /g' >> "$txt"
-    cat "$json" | jq '.mentions' | grep name | sed 's/^/mentions: /g'  >> "$txt"
-    cat "$json" | jq '.mentions' | grep nick | sed 's/^/mentions: /g'  >> "$txt"
 
-    cat "$json" | jq '.author' | grep name | sed 's/^/author: /g' >> "$txt"
-    cat "$json" | jq '.author' | grep nick | sed 's/^/author: /g' >> "$txt"
-    cat "$json" | jq '.author' | grep id | sed 's/^/author: /g' >> "$txt"
+    greptag ".mentions" id mentions
+    greptag ".mentions" name mentions
+    greptag ".mentions" nick mentions
+
+
+    greptag ".author" id author
+    greptag ".author" name author
+    greptag ".author" nick author
 
     cat "$json" | jq '.hashtags' | grep -v "\[" | grep -v "\]" |  sed 's/^/hashtag: /g' >> "$txt"
 
@@ -109,8 +120,10 @@ bluesky)
     textise
 
     basictag ".post_id" post_id
-    cat "$json" | jq '.author' | grep handle | sed 's/^/author: /g' >> "$txt"
-    cat "$json" | jq '.author' | grep displayName | sed 's/^/author: /g' >> "$txt"
+
+    greptag ".author" handle author
+    greptag ".author" displayname author
+
     cat "$json" | jq '.labels.values' | grep val | sed 's/\"val\"://g' | sed 's/,/\n/g'  |  sed 's/^/bluesky_label: /g' >> "$txt"
   done
 ;;
