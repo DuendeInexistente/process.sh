@@ -38,12 +38,12 @@ greptag() {
 
 
 
-
-find -type d -path ./gallery-dl/\* | while read p; do
+# -newermt $(date +%Y-%m-%d -d '4 days ago') What for?
+find -L gallery-dl -type d | while IFS= read -r p; do
 #Primer find  
   echo -----------------------
   movepath="$startdir/$p"
-  echo "route: $movepath"
+  echo "route: \($movepath\)"
   cd "$movepath"
   category=$(cat "$(find -iname "*.json" | head -1)" | jq .category | sed 's/"//g')
   subcat=$(cat "$(find -iname "*.json" | head -1)" | jq .subcategory | sed 's/"//g')
@@ -107,6 +107,14 @@ case $category in
     greptag ".author" id author
     greptag ".author" name author
     greptag ".author" nick author
+    
+    
+    greptag ".author" id involves
+    greptag ".author" name involves
+    greptag ".author" nick involves
+    greptag ".mentions" id involves
+    greptag ".mentions" name involves
+    greptag ".mentions" nick involves
 
     cat "$json" | jq '.hashtags' | grep -v "\[" | grep -v "\]" |  sed 's/^/hashtag: /g' >> "$txt"
 
@@ -150,6 +158,21 @@ itaku)
     cat "$json" | jq .sections | sed 's/^  "/itaku_folder: /g' | sed 's/,$//g' | sed 's/\"$//g' >> $txt
   done
   ;;
+redgifs)
+  for json in *.json ; do
+    textise
+    basictag ".userName" redgif_user
+    basictag ".sexuality" redgif_sex
+    cat "$json" | jq .sexuality | grep -v "\[" | grep -v "\]" | sed 's/ /\n/g' | sed 's/^/redgif_sex:/g' | sed 's/redgif_sex:$//g' >> $txt
+  done
+  ;;
+reddit)
+  for json in *.json ; do
+    textise
+    basictag ".author" reddit_user
+  done
+  ;;
+
 directlink)
   for json in *.json ; do
     textise
@@ -171,6 +194,11 @@ case $subcat in
       basictag ".num" page
     done
 ;;
+ gumroad)
+  for json in *.json ; do
+    textise
+    basictag ".user" artist
+  done
 esac
 
 
@@ -233,7 +261,17 @@ esac
 
 
 
-
+for file in *.(zip|rar|7z); do 
+	echo $file
+	unar -f "$file" -o "$file ext"
+	cp "$file.txt" "$file ext/tags.txt"
+	cd "$file ext"
+	echo "zipfile" >> tags.txt
+		for file in ./**/*; do
+			cp tags.txt "$file.txt"
+		done
+	cd ..
+done
 
 
 
