@@ -172,6 +172,14 @@ reddit)
     basictag ".author" reddit_user
   done
   ;;
+furaffinity)
+  for json in *.json ; do
+  textise
+  basictag .folders fa_folder
+  basictag .artist artist
+  basictag .rating fa_rating
+  done
+;;
 
 directlink)
   for json in *.json ; do

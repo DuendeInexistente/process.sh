@@ -1,5 +1,5 @@
 #!/usr/bin/zsh
-cd "/media/cammera/Datos/Pictures/gallery-dl"
+cd "/mnt/OldExt/Archives/gallery-dl/"
 mkdir -p logs
 date=$(date)
 echo " " >>"logs/$date.txt"
