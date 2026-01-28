@@ -37,6 +37,13 @@ greptag() {
 }
 
 
+nodomaintag() {
+ # echo $json \"$json\"
+ # cat "$json" | jq $1 | sed 's/^/\${2}: /g' >> "$txt"
+ #sed doesn't like dealing with $variables, not at all
+ cat "$json" | jq $1 >>$txt
+}
+
 
 # -newermt $(date +%Y-%m-%d -d '4 days ago') What for?
 find -L gallery-dl -type d | while IFS= read -r p; do
@@ -188,6 +195,34 @@ directlink)
     basictag ".domain" domain
   done
   ;;
+
+ wikimediacommons)
+  for json in *.json ; do
+    textise
+    notxt="$(echo $json | sed 's/\.json/\.notes\.txt/g')"
+    cat "$json" | jq .extmetadata.Categories.value | sed -r 's/\|/\n/g' | sed 's/^/mediawikicat\:/g' >> $txt
+    basictag ".page" page
+    echo "&wikimedia: $(cat $json | jq .comment | grep -v UploadWizard | grep -vi flickr2commons  | grep -v int\:filedesc | sed -r 's/\:/\;/g' | sed -r 's/\n\n/--/g' | sed -r 's/\n\n/--/g' )" > $notxt
+    #echo >>$notxt
+    #echo   >>$notxt
+  done
+  ;;
+ newgrounds)
+  for json in *json ; do
+    textise
+    basictag ".tags"
+  done
+  ;;
+ webtoons)
+  for json in *json ; do
+    textise
+    basictag ".author_name" artist
+    basictag ".comic_name" comic
+    basictag ".episode_name" episode
+    basictag ".episode_no" episode
+    basictag ".num" page
+  done
+  ;;
 esac
 
 
@@ -207,6 +242,7 @@ case $subcat in
     textise
     basictag ".user" artist
   done
+;;
 esac
 
 
@@ -260,6 +296,8 @@ esac
       sed 's/"//g' |\
       \
       sed 's/,$//g' |\
+      \
+      sed 's/^://g' |\
       \
       sed 's/  / /g' | sed 's/  / /g' | sed 's/  / /g' > /tmp/a.txt
       cp -f /tmp/a.txt $file
